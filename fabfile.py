@@ -41,7 +41,7 @@ packages = ' '.join([
 	'jaraco.pmxbot',
 	'pymongo',
 	'chucknorris',
-	# 'pmxbot-haiku',
+	'pmxbot-haiku',
 ])
 
 @api.task
