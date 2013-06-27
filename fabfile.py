@@ -31,8 +31,8 @@ def install_python(version='3.3.2'):
 
 @api.task
 def install_setuptools():
-	run('wget https://bitbucket.org/pypa/setuptools/raw/0.7.1/ez_setup.py')
-	sudo('python3.3 ez_setup.py --download-base=https://bitbucket.org/pypa/setuptools/downloads/')
+	run('wget https://bitbucket.org/pypa/setuptools/downloads/ez_setup.py')
+	sudo('python3.3 ez_setup.py')
 	sudo('rm setuptools* ez_setup.py')
 
 packages = ' '.join([
