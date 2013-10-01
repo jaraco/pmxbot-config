@@ -22,9 +22,8 @@ def install_python():
 
 @api.task
 def install_setuptools():
-	run('wget https://bitbucket.org/pypa/setuptools/downloads/ez_setup.py')
-	sudo('python3.3 ez_setup.py')
-	sudo('rm setuptools* ez_setup.py')
+	sudo('wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python3.3')
+	sudo('rm setuptools*')
 
 packages = ' '.join([
 	'pmxbot',
