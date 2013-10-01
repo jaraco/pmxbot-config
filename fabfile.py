@@ -6,14 +6,16 @@ from fabric.api import sudo
 
 @api.task
 def install_config():
-	context = dict(
-		password=getpass.getpass('MongoDB password for pmxbot> '),
-	)
+	db_pass = getpass.getpass('MongoDB password for pmxbot> ')
+	context = dict(password=db_pass)
 	sudo('mkdir -p /etc/pmxbot')
-	files.upload_template('database.conf', '/etc/pmxbot/database.conf',
-		context=context, use_sudo=True, mode=0o600)
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
+	files.upload_template('web.conf', '/etc/pmxbot/web.conf',
+		use_sudo=True)
+	if db_pass:
+		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
+			context=context, use_sudo=True, mode=0o600)
 
 @api.task
 def install_python():
