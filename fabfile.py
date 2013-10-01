@@ -45,7 +45,7 @@ def install_pmxbot():
 def install_supervisor():
 	sudo('aptitude install -y supervisor')
 	files.upload_template('supervisor.conf',
-		'/etc/supervisor/conf.d/pmxbot.conf')
+		'/etc/supervisor/conf.d/pmxbot.conf', use_sudo=True)
 	sudo('supervisorctl reload')
 
 @api.task
