@@ -2,7 +2,7 @@ import getpass
 
 from fabric.contrib import files
 from fabric import api
-from fabric.api import sudo
+from fabric.api import sudo, run
 
 @api.task
 def install_config():
@@ -58,7 +58,20 @@ def update_pmxbot():
 	sudo('supervisorctl restart pmxbotweb')
 
 @api.task
+def ensure_fqdn():
+	"""
+	Ensure 'hostname -f' returns a fully-qualified hostname.
+	"""
+	hostname = run('hostname -f')
+	if '.' in hostname:
+		return
+	cmd = 'sed -i -e "s/{hostname}/{hostname}.dcpython.org {hostname}/g" /etc/hosts'
+	cmd = cmd.format(hostname=hostname)
+	sudo(cmd)
+
+@api.task
 def bootstrap():
+	ensure_fqdn()
 	install_config()
 	install_python()
 	install_setuptools()
