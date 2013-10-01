@@ -11,7 +11,7 @@ def install_config():
 	)
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('database.conf', '/etc/pmxbot/database.conf',
-		context=context, use_sudo=True, mode=0600)
+		context=context, use_sudo=True, mode=0o600)
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
 
