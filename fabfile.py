@@ -7,7 +7,7 @@ from fabric.api import sudo, run
 @api.task
 def install_config():
 	db_pass = getpass.getpass('MongoDB password for pmxbot> ')
-	context = dict(password=db_pass)
+	twilio_token = getpass.getpass('Token for twilio> ')
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
@@ -15,7 +15,10 @@ def install_config():
 		use_sudo=True)
 	if db_pass:
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
-			context=context, use_sudo=True, mode=0o600)
+			context=dict(password=db_pass), use_sudo=True, mode=0o600)
+	if twilio_token or not files.exists('/etc/pmxbot/twilio.conf'):
+		files.upload_template('twilio.conf', '/etc/pmxbot/twilio.conf',
+			context=dict(token=twilio_token), use_sudo=True, mode=0o600)
 
 @api.task
 def install_python():
@@ -34,6 +37,7 @@ packages = ' '.join([
 	'pymongo',
 	'chucknorris',
 	'pmxbot-haiku',
+	'twilio',
 ])
 
 @api.task
