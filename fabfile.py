@@ -2,12 +2,14 @@ import getpass
 
 from fabric.contrib import files
 from fabric import api
-from fabric.api import sudo, run
+from fabric.api import sudo, run, env
+
+env.hosts = ['chat-logs.dcpython.org']
 
 @api.task
 def install_config():
-	db_pass = getpass.getpass('MongoDB password for pmxbot> ')
-	twilio_token = getpass.getpass('Token for twilio> ')
+	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
+	twilio_token = getpass.getpass('Token for twilio [skip]> ')
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
