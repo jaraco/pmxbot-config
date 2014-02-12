@@ -40,6 +40,7 @@ packages = ' '.join([
 	'chucknorris',
 	'pmxbot-haiku',
 	'twilio',
+	'motivation'
 ])
 
 @api.task
