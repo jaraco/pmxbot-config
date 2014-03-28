@@ -35,7 +35,7 @@ def install_python():
 
 @api.task
 def install_setuptools():
-	sudo('wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python3.3')
+	sudo('wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python3.4')
 	sudo('rm setuptools*')
 
 packages = ' '.join([
@@ -52,8 +52,8 @@ packages = ' '.join([
 @api.task
 def install_pmxbot():
 	"Install pmxbot into a PEP-370 env at /usr/local/pmxbot"
-	sudo('mkdir -p /usr/local/pmxbot/lib/python3.3/site-packages')
-	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.3 --user '
+	sudo('mkdir -p /usr/local/pmxbot/lib/python3.4/site-packages')
+	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.4 --user '
 		+ packages)
 
 @api.task
@@ -65,7 +65,7 @@ def install_supervisor():
 
 @api.task
 def update_pmxbot():
-	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.3 --user -U '
+	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.4 --user -U '
 		+ packages)
 	sudo('supervisorctl restart pmxbot')
 	sudo('supervisorctl restart pmxbotweb')
