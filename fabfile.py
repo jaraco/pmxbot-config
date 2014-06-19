@@ -35,7 +35,7 @@ def install_python():
 
 @api.task
 def install_setuptools():
-	sudo('wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python3.4')
+	sudo('wget https://bootstrap.pypa.io/ez_setup.py -O - | python3.4')
 	sudo('rm setuptools*')
 
 packages = ' '.join([
