@@ -40,6 +40,8 @@ def install_setuptools():
 
 packages = ' '.join([
 	'pmxbot',
+	'excuses',
+	'popquotes',
 	'pmxbot-wolframalpha',
 	'jaraco.pmxbot',
 	'pymongo',
