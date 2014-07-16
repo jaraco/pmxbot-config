@@ -14,6 +14,7 @@ env.hosts = ['chat-logs.dcpython.org']
 def install_config():
 	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
 	twilio_token = getpass.getpass('Token for twilio [skip]> ')
+	google_trans_key = getpass.getpass('Google Translate key [skip]> ')
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
@@ -25,6 +26,9 @@ def install_config():
 	if twilio_token or not files.exists('/etc/pmxbot/twilio.conf'):
 		files.upload_template('twilio.conf', '/etc/pmxbot/twilio.conf',
 			context=dict(token=twilio_token), use_sudo=True, mode=0o600)
+	if google_trans_key or not files.exists('/etc/pmxbot/trans.conf'):
+		files.upload_template('trans.conf', '/etc/pmxbot/trans.conf',
+			context=dict(key=google_trans_key), use_sudo=True, mode=0o600)
 
 @api.task
 def install_python():
@@ -49,6 +53,7 @@ packages = ' '.join([
 	'pmxbot-haiku',
 	'twilio',
 	'motivation',
+	'jaraco.translate',
 ])
 
 @api.task
