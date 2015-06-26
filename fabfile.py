@@ -19,7 +19,7 @@ def install_config():
 	if irc_pass:
 		files.upload_template('password.conf', '/etc/pmxbot/password.conf',
 			context=dict(password=irc_pass), use_sudo=True, mode=0o600)
-	if db_pass:
+	if db_pass or not files.exists('/etc/pmxbot/database.conf'):
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
 	if twilio_token or not files.exists('/etc/pmxbot/twilio.conf'):
