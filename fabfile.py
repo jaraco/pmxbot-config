@@ -9,12 +9,16 @@ from fabric.api import sudo, run
 
 @api.task
 def install_config():
+	irc_pass = getpass.getpass('Password for irc [skip]> ')
 	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
 	twilio_token = getpass.getpass('Token for twilio [skip]> ')
 	google_trans_key = getpass.getpass('Google Translate key [skip]> ')
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
+	if irc_pass:
+		files.upload_template('password.conf', '/etc/pmxbot/password.conf',
+			context=dict(password=irc_pass), use_sudo=True, mode=0o600)
 	if db_pass:
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
