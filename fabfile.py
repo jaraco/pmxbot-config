@@ -1,5 +1,4 @@
 """
-Install pmxbot on DCPython's Saucy Salamander server
 """
 
 import getpass
@@ -32,8 +31,6 @@ def install_config():
 
 @api.task
 def install_python():
-	sudo('aptitude install -y software-properties-common')
-	sudo('apt-add-repository -y ppa:fkrull/deadsnakes')
 	sudo('aptitude update')
 	sudo('aptitude install -y python3.4')
 
