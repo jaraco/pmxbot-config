@@ -5,9 +5,7 @@ import getpass
 
 from fabric.contrib import files
 from fabric import api
-from fabric.api import sudo, run, env
-
-env.hosts = ['chat-logs.dcpython.org']
+from fabric.api import sudo, run
 
 @api.task
 def install_config():
