@@ -5,7 +5,9 @@ import getpass
 
 from fabric.contrib import files
 from fabric import api
-from fabric.api import sudo, run
+from fabric.api import sudo, run, env
+
+env.hosts = ['elektra']
 
 @api.task
 def install_config():
