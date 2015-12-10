@@ -51,7 +51,7 @@ packages = ' '.join([
 	'pmxbot',
 	'excuses',
 	'popquotes',
-	'pmxbot-wolframalpha',
+	'wolframalpha',
 	'jaraco.pmxbot',
 	'pymongo',
 	'chucknorris',
@@ -81,6 +81,7 @@ def update_pmxbot():
 		+ packages)
 	sudo('supervisorctl restart pmxbot')
 	#sudo('supervisorctl restart pmxbotweb')
+	sudo('rm -R /usr/local/pmxbot/lib/python*/site-packages/pmxbot_wolframalpha*')
 
 @api.task
 def ensure_fqdn():
