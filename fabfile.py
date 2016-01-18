@@ -15,6 +15,7 @@ def install_config():
 	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
 	twilio_token = getpass.getpass('Token for twilio [skip]> ')
 	google_trans_key = getpass.getpass('Google Translate key [skip]> ')
+	wolframalpha_key = getpass.getpass('Wolfram|Alpha key [skip]> ')
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
@@ -29,6 +30,9 @@ def install_config():
 	if google_trans_key or not files.exists('/etc/pmxbot/trans.conf'):
 		files.upload_template('trans.conf', '/etc/pmxbot/trans.conf',
 			context=dict(key=google_trans_key), use_sudo=True, mode=0o600)
+	if wolframalpha_key or not files.exists('/etc/pmxbot/wolframalpha.conf'):
+		files.upload_template('wolframalpha.conf', '/etc/pmxbot/wolframalpha.conf',
+			context=dict(key=wolframalpha_key), use_sudo=True, mode=0o600)
 
 @api.task
 def install_python():
