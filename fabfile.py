@@ -4,10 +4,13 @@
 import getpass
 
 from fabric.contrib import files
+from fabric.context_managers import shell_env
 from fabric import api
 from fabric.api import sudo, run, env
 
 env.hosts = ['elektra']
+
+python = 'python3.4'
 
 @api.task
 def install_config():
@@ -46,11 +49,12 @@ def install_web_component():
 @api.task
 def install_python():
 	sudo('aptitude update')
-	sudo('aptitude install -y python3.4')
+	sudo('aptitude install -y {python}'.format_map(globals()))
 
 @api.task
 def install_setuptools():
-	sudo('wget https://bootstrap.pypa.io/ez_setup.py -O - | python3.4')
+	tmpl = 'wget https://bootstrap.pypa.io/ez_setup.py -O - | {python}'
+	sudo(tmpl.format_map(globals()))
 	sudo('rm setuptools*')
 
 packages = ' '.join([
@@ -67,12 +71,18 @@ packages = ' '.join([
 	'jaraco.translate',
 ])
 
+install_env = dict(
+	PYTHONUSERBASE='/usr/local/pmxbot',
+)
+
 @api.task
 def install_pmxbot():
 	"Install pmxbot into a PEP-370 env at /usr/local/pmxbot"
-	sudo('mkdir -p /usr/local/pmxbot/lib/python3.4/site-packages')
-	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.4 --user '
-		+ packages)
+	tmpl = 'mkdir -p /usr/local/pmxbot/lib/{python}/site-packages'
+	sudo(tmpl.formap_map(globals()))
+	tmpl = '{python} -m easy_install --user {packages}'
+	with shell_env(**install_env):
+		sudo(tmpl.format_map(globals()))
 
 @api.task
 def install_supervisor():
@@ -83,8 +93,9 @@ def install_supervisor():
 
 @api.task
 def update_pmxbot():
-	sudo('PYTHONUSERBASE=/usr/local/pmxbot easy_install-3.4 --user -U '
-		+ packages)
+	tmpl = '{python} -m easy_install --user -U {packages}'
+	with shell_env(**install_env):
+		sudo(tmpl.format_map(globals()))
 	sudo('supervisorctl restart pmxbot')
 	#sudo('supervisorctl restart pmxbotweb')
 
