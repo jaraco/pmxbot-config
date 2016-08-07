@@ -9,9 +9,9 @@ from fabric.context_managers import shell_env
 from fabric import api
 from fabric.api import sudo, run, env
 
-env.hosts = ['chat-logs.dcpython.org']
-
-python = 'python3.4'
+host = 'chat-logs'
+domain = 'dcpython.org'
+env.hosts = ['.'.join((host, domain))]
 
 @api.task
 def install_config():
@@ -42,13 +42,7 @@ def install_python():
 	sudo('aptitude install -y software-properties-common')
 	sudo('apt-add-repository -y ppa:fkrull/deadsnakes')
 	sudo('aptitude update')
-	sudo('aptitude install -y {python}'.format_map(globals()))
-
-@api.task
-def install_setuptools():
-	tmpl = 'wget https://bootstrap.pypa.io/ez_setup.py -O - | {python}'
-	sudo(tmpl.format_map(globals()))
-	sudo('rm setuptools*')
+	sudo('aptitude -q install -y python3-pip')
 
 packages = ' '.join([
 	'pmxbot',
@@ -71,22 +65,22 @@ install_env = dict(
 @api.task
 def install_pmxbot():
 	"Install pmxbot into a PEP-370 env at /usr/local/pmxbot"
-	tmpl = 'mkdir -p /usr/local/pmxbot/lib/{python}/site-packages'
-	sudo(tmpl.formap_map(globals()))
-	tmpl = '{python} -m easy_install --user {packages}'
+	tmpl = 'python3 -m pip install --user {packages}'
 	with shell_env(**install_env):
+		usp = run('python3 -c "import site; print(site.getusersitepackages())"')
+		sudo("mkdir -p {usp}".format(**locals()))
 		sudo(tmpl.format_map(globals()))
 
 @api.task
 def install_supervisor():
-	sudo('aptitude install -y supervisor')
+	sudo('aptitude -q install -y supervisor')
 	files.upload_template('supervisor.conf',
 		'/etc/supervisor/conf.d/pmxbot.conf', use_sudo=True)
 	sudo('supervisorctl reload')
 
 @api.task
 def update_pmxbot():
-	tmpl = '{python} -m easy_install --user -U {packages}'
+	tmpl = 'python3 -m pip install --user -U {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
 	sudo('supervisorctl restart pmxbot')
@@ -100,8 +94,8 @@ def ensure_fqdn():
 	hostname = run('hostname -f')
 	if '.' in hostname:
 		return
-	cmd = 'sed -i -e "s/{hostname}/{hostname}.dcpython.org {hostname}/g" /etc/hosts'
-	cmd = cmd.format(hostname=hostname)
+	cmd = 'sed -i -e "s/{hostname}/{hostname}.{domain} {hostname}/g" /etc/hosts'
+	cmd = cmd.format(hostname=hostname, domain=domain)
 	sudo(cmd)
 
 @api.task
@@ -109,6 +103,5 @@ def bootstrap():
 	ensure_fqdn()
 	install_config()
 	install_python()
-	install_setuptools()
 	install_supervisor()
 	install_pmxbot()
