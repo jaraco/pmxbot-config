@@ -1,0 +1,10 @@
+[Unit]
+Description=chat bot web service
+After=mongod.service network.target
+
+[Service]
+Environment=PYTHONUSERBASE=%(install_root)s
+ExecStart=%(install_root)s/bin/pmxbotweb /etc/pmxbot/web.conf /etc/pmxbot/database.conf
+
+[Install]
+WantedBy=multi-user.target

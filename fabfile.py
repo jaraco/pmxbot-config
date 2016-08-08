@@ -62,31 +62,48 @@ packages = ' '.join([
 	'jaraco.translate',
 ])
 
+install_root = '/opt/pmxbot'
+
 install_env = dict(
-	PYTHONUSERBASE='/usr/local/pmxbot',
+	PYTHONUSERBASE=install_root,
 )
 
 @api.task
 def install_pmxbot():
-	"Install pmxbot into a PEP-370 env at /usr/local/pmxbot"
+	"Install pmxbot into a PEP-370 env at install_root"
 	tmpl = '{python} -m pip install --user {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
 
 @api.task
-def install_supervisor():
-	sudo('apt -q install -y supervisor')
-	files.upload_template('supervisor.conf',
-		'/etc/supervisor/conf.d/pmxbot.conf', use_sudo=True)
-	sudo('supervisorctl reload')
+def install_systemd_service():
+	files.upload_template('pmxbot.service',
+		'/etc/systemd/system',
+		context=globals(),
+		use_sudo=True,
+	)
+	sudo('systemctl restart pmxbot')
+	sudo('systemctl enable pmxbot')
+
+@api.task
+def install_systemd_web_service():
+	files.upload_template('web.conf', '/etc/pmxbot/web.conf',
+		use_sudo=True)
+	files.upload_template('pmxbot.web.service',
+		'/etc/systemd/system',
+		context=globals(),
+		use_sudo=True,
+	)
+	sudo('systemctl restart pmxbot.web')
+	sudo('systemctl enable pmxbot.web')
 
 @api.task
 def update_pmxbot():
 	tmpl = '{python} -m pip install --user -U {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
-	sudo('supervisorctl restart pmxbot')
-	sudo('supervisorctl restart pmxbotweb')
+	sudo('systemctl restart pmxbot')
+	sudo('systemctl restart pmxbotweb')
 
 @api.task
 def ensure_fqdn():
@@ -105,5 +122,5 @@ def bootstrap():
 	ensure_fqdn()
 	install_config()
 	install_python()
-	install_supervisor()
 	install_pmxbot()
+	install_systemd_service()
