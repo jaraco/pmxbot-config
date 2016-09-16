@@ -13,7 +13,7 @@ domain = 'jaraco.com'
 
 @api.task
 def install_config():
-	irc_pass = getpass.getpass('Password for irc [skip]> ')
+	slack_token = getpass.getpass('Slack token [skip]> ')
 	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
 	twilio_token = getpass.getpass('Token for twilio [skip]> ')
 	google_trans_key = getpass.getpass('Google Translate key [skip]> ')
@@ -21,9 +21,9 @@ def install_config():
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
-	if irc_pass:
-		files.upload_template('password.conf', '/etc/pmxbot/password.conf',
-			context=dict(password=irc_pass), use_sudo=True, mode=0o600)
+	if slack_token:
+		files.upload_template('slack.conf', '/etc/pmxbot/slack.conf',
+			context={'slack token': slack_token}, use_sudo=True, mode=0o600)
 	if db_pass or not files.exists('/etc/pmxbot/database.conf'):
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
@@ -54,6 +54,7 @@ packages = ' '.join([
 	'twilio',
 	'motivation',
 	'jaraco.translate',
+	'slackclient',
 ])
 
 install_root = '/opt/pmxbot'
@@ -98,8 +99,8 @@ def update_pmxbot():
 	tmpl = 'python3 -m pip install --user -U {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
-	sudo('supervisorctl restart pmxbot')
-	#sudo('supervisorctl restart pmxbotweb')
+	sudo('systemctl restart pmxbot')
+	#sudo('systemctl restart pmxbotweb')
 
 @api.task
 def ensure_fqdn():
