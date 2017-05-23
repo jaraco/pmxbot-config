@@ -50,7 +50,7 @@ def install_python():
 		sudo(tmpl.format_map(globals()))
 
 packages = ' '.join([
-	'pmxbot',
+	'pmxbot[irc,mongodb,viewer]',
 	'excuses',
 	'popquotes',
 	'wolframalpha',
