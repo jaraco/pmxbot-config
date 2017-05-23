@@ -13,6 +13,8 @@ host = 'chat-logs'
 domain = 'dcpython.org'
 env.hosts = ['.'.join((host, domain))]
 
+python = 'python3.4'
+
 @api.task
 def install_config():
 	db_pass = getpass.getpass('MongoDB password for pmxbot [skip]> ')
@@ -41,8 +43,11 @@ def install_config():
 def install_python():
 	sudo('aptitude install -y software-properties-common')
 	sudo('apt-add-repository -y ppa:fkrull/deadsnakes')
-	sudo('aptitude update')
-	sudo('aptitude -q install -y python3-pip')
+	#sudo('aptitude update')
+	sudo('aptitude -q install -y {python}'.format_map(globals()))
+	with shell_env(**install_env):
+		tmpl = 'wget https://bootstrap.pypa.io/get-pip.py -O - | {python} - --user'
+		sudo(tmpl.format_map(globals()))
 
 packages = ' '.join([
 	'pmxbot',
@@ -65,10 +70,8 @@ install_env = dict(
 @api.task
 def install_pmxbot():
 	"Install pmxbot into a PEP-370 env at /usr/local/pmxbot"
-	tmpl = 'python3 -m pip install --user {packages}'
+	tmpl = '{python} -m pip install --user {packages}'
 	with shell_env(**install_env):
-		usp = run('python3 -c "import site; print(site.getusersitepackages())"')
-		sudo("mkdir -p {usp}".format(**locals()))
 		sudo(tmpl.format_map(globals()))
 
 @api.task
@@ -80,7 +83,7 @@ def install_supervisor():
 
 @api.task
 def update_pmxbot():
-	tmpl = 'python3 -m pip install --user -U {packages}'
+	tmpl = '{python} -m pip install --user -U {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
 	sudo('supervisorctl restart pmxbot')
