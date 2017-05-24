@@ -1,4 +1,5 @@
 """
+Install pmxbot on Xenial server
 """
 
 import getpass
@@ -8,8 +9,11 @@ from fabric.context_managers import shell_env
 from fabric import api
 from fabric.api import sudo, run, env
 
-env.hosts = ['punisher']
+host = 'punisher'
 domain = 'jaraco.com'
+env.hosts = ['.'.join((host, domain))]
+
+python = 'python3.6'
 
 @api.task
 def install_config():
@@ -24,7 +28,11 @@ def install_config():
 	if slack_token:
 		files.upload_template('slack.conf', '/etc/pmxbot/slack.conf',
 			context={'slack token': slack_token}, use_sudo=True, mode=0o600)
-	if db_pass or not files.exists('/etc/pmxbot/database.conf'):
+	files.upload_template('web.conf', '/etc/pmxbot/web.conf',
+		use_sudo=True)
+	files.upload_template('password.conf', '/etc/pmxbot/password.conf',
+		use_sudo=True)
+    if db_pass or not files.exists('/etc/pmxbot/database.conf'):
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
 	if twilio_token or not files.exists('/etc/pmxbot/twilio.conf'):
@@ -43,7 +51,7 @@ def install_python():
 	sudo('aptitude -q install -y python3-pip')
 
 packages = ' '.join([
-	'pmxbot',
+	'pmxbot[irc,mongodb,viewer]',
 	'excuses',
 	'popquotes',
 	'wolframalpha',
@@ -66,10 +74,8 @@ install_env = dict(
 @api.task
 def install_pmxbot():
 	"Install pmxbot into a PEP-370 env at install_root"
-	tmpl = 'python3 -m pip install --user {packages}'
+	tmpl = '{python} -m pip install --user {packages}'
 	with shell_env(**install_env):
-		usp = run('python3 -c "import site; print(site.getusersitepackages())"')
-		sudo("mkdir -p {usp}".format(**locals()))
 		sudo(tmpl.format_map(globals()))
 
 @api.task
@@ -96,11 +102,11 @@ def install_systemd_web_service():
 
 @api.task
 def update_pmxbot():
-	tmpl = 'python3 -m pip install --user -U {packages}'
+	tmpl = '{python} -m pip install --user -U {packages}'
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
 	sudo('systemctl restart pmxbot')
-	#sudo('systemctl restart pmxbotweb')
+	sudo('systemctl restart pmxbot.web')
 
 @api.task
 def ensure_fqdn():
