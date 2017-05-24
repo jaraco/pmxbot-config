@@ -1,5 +1,5 @@
 """
-Install pmxbot on DCPython's Saucy Salamander server
+Install pmxbot on DCPython's Xenial server
 """
 
 import getpass
