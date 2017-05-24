@@ -105,7 +105,7 @@ def update_pmxbot():
 	with shell_env(**install_env):
 		sudo(tmpl.format_map(globals()))
 	sudo('systemctl restart pmxbot')
-	sudo('systemctl restart pmxbotweb')
+	sudo('systemctl restart pmxbot.web')
 
 @api.task
 def ensure_fqdn():
