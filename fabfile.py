@@ -45,11 +45,15 @@ def install_config():
 
 @api.task
 def install_python():
-	sudo('aptitude update')
-	sudo('aptitude -q install -y python3-pip')
+	sudo('apt-add-repository -y ppa:fkrull/deadsnakes')
+	sudo('apt update')
+	sudo('apt -q install -y {python}'.format_map(globals()))
+	with shell_env(**install_env):
+		tmpl = 'wget https://bootstrap.pypa.io/get-pip.py -O - | {python} - --user'
+		sudo(tmpl.format_map(globals()))
 
 packages = ' '.join([
-	'pmxbot[irc,mongodb,viewer]',
+	'pmxbot[slack,mongodb]',
 	'excuses',
 	'popquotes',
 	'wolframalpha',
