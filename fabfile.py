@@ -26,6 +26,8 @@ def install_config():
 		use_sudo=True)
 	files.upload_template('web.conf', '/etc/pmxbot/web.conf',
 		use_sudo=True)
+	files.upload_template('password.conf', '/etc/pmxbot/password.conf',
+		use_sudo=True)
 	if db_pass:
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
