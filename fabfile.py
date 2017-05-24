@@ -25,14 +25,12 @@ def install_config():
 	sudo('mkdir -p /etc/pmxbot')
 	files.upload_template('pmxbot.conf', '/etc/pmxbot/main.conf',
 		use_sudo=True)
-	if slack_token:
-		files.upload_template('slack.conf', '/etc/pmxbot/slack.conf',
-			context={'slack token': slack_token}, use_sudo=True, mode=0o600)
 	files.upload_template('web.conf', '/etc/pmxbot/web.conf',
 		use_sudo=True)
-	files.upload_template('password.conf', '/etc/pmxbot/password.conf',
-		use_sudo=True)
-    if db_pass or not files.exists('/etc/pmxbot/database.conf'):
+	if slack_token or not files.exists('/etc/pmxbot/server.conf'):
+		files.upload_template('server.conf', '/etc/pmxbot/server.conf',
+			context={'slack token': slack_token}, use_sudo=True, mode=0o600)
+	if db_pass or not files.exists('/etc/pmxbot/database.conf'):
 		files.upload_template('database.conf', '/etc/pmxbot/database.conf',
 			context=dict(password=db_pass), use_sudo=True, mode=0o600)
 	if twilio_token or not files.exists('/etc/pmxbot/twilio.conf'):
