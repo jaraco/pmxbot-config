@@ -5,7 +5,6 @@ Install pmxbot on DCPython's Xenial server
 import getpass
 
 from fabric.contrib import files
-from fabric.context_managers import shell_env
 from fabric import api
 from fabric.api import sudo, run, env
 
@@ -55,10 +54,7 @@ def install_config():
 def install_python():
 	sudo('apt-add-repository -y ppa:fkrull/deadsnakes')
 	sudo('apt update')
-	sudo('apt -q install -y {python}'.format_map(globals()))
-	with shell_env(**install_env):
-		tmpl = 'wget https://bootstrap.pypa.io/get-pip.py -O - | {python} - --user'
-		sudo(tmpl.format_map(globals()))
+	sudo('apt -q install -y {python}-venv'.format_map(globals()))
 
 
 packages = ' '.join([
@@ -77,17 +73,13 @@ packages = ' '.join([
 
 install_root = '/opt/pmxbot'
 
-install_env = dict(
-	PYTHONUSERBASE=install_root,
-)
-
 
 @api.task
 def install_pmxbot():
-	"Install pmxbot into a PEP-370 env at install_root"
-	tmpl = '{python} -m pip install --user {packages}'
-	with shell_env(**install_env):
-		sudo(tmpl.format_map(globals()))
+	"Install pmxbot into a venv at install_root"
+	sudo(f'{python} -m venv {install_root}')
+	sudo(f'{install_root}/bin/pip install -U setuptools pip')
+	sudo(f'{install_root}/bin/pip install -U {packages}')
 
 
 @api.task
@@ -119,9 +111,7 @@ def install_systemd_web_service():
 
 @api.task
 def update_pmxbot():
-	tmpl = '{python} -m pip install --user -U {packages}'
-	with shell_env(**install_env):
-		sudo(tmpl.format_map(globals()))
+	install_pmxbot()
 	sudo('systemctl restart pmxbot')
 	sudo('systemctl restart pmxbot.web')
 
