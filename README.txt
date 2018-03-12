@@ -1,5 +1,5 @@
 This project provides a Fabric file suitable for installing a
-pmxbot instance on a clean Ubuntu Trusty host.
+pmxbot instance on a clean Ubuntu host.
 
 To use it, simply install fabric in your local environment, then invoke:
 
