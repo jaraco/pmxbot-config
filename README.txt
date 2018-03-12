@@ -1,5 +1,5 @@
 This project provides a Fabric file suitable for installing the DCPython
-pmxbot instance on a clean Ubuntu Precise host, such as the one that
+pmxbot instance on a clean Ubuntu host, such as the one that
 RackSpace kindly donates for our purposes.
 
 To use it, simply install fabric in your local environment, then invoke:
